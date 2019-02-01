@@ -81,8 +81,6 @@ module API
             helpers ::API::V3::Users::UpdateUser
 
             before do
-              authorize_logged_in
-
               @user =
                 if params[:id] == 'me'
                   User.current
@@ -96,11 +94,13 @@ module API
             end
 
             patch do
+              authorize_logged_in
               authorize_admin
               update_user(request_body, current_user)
             end
 
             delete do
+              authorize_logged_in
               if ::Users::DeleteService.new(@user, current_user).call
                 status 202
               else
