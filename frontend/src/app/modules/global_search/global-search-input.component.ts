@@ -54,6 +54,7 @@ export class GlobalSearchInputComponent implements OnInit {
   public expanded:boolean = false;
   public results:any[];
   public suggestions:any[];
+  public mobileSearch:boolean = false;
 
   private $element:JQuery;
 
@@ -87,8 +88,33 @@ export class GlobalSearchInputComponent implements OnInit {
 
     // handle click on search button
     if (ContainHelpers.insideOrSelf(this.btn.nativeElement, event.target)) {
-      this.submitNonEmptySearch();
+      if (this.isMobile) {
+        this.toggleMobileSearch();
+        // open ng-select menu on default
+        jQuery('.ng-input input').focus();
+        this.ngSelectComponent.isOpen = true;
+      } else {
+        this.submitNonEmptySearch();
+      }
     }
+  }
+
+  // if window is resized while mobile search is still open close search
+  @HostListener('window:resize', ['$event'])
+  onResize(event:any) {
+    if (event.target.innerWidth > 680 && this.mobileSearch) {
+      this.ngSelectComponent.close();
+      this.toggleMobileSearch();
+    }
+  }
+
+  // open or close mobile search
+  public toggleMobileSearch() {
+    // show / hide DOM elements
+    jQuery('.ng-select, #account-nav-right, #account-nav-left, #main-menu-toggle').toggleClass('hidden-for-mobile');
+    // set correct classes
+    this.mobileSearch = !this.mobileSearch;
+    this.expanded = !this.expanded;
   }
 
   // load selected item
@@ -128,8 +154,10 @@ export class GlobalSearchInputComponent implements OnInit {
   }
 
   public onFocusOut() {
-    this.expanded = false;
-    this.ngSelectComponent.isOpen = false;
+    if (!this.isMobile) {
+      this.expanded = false;
+      this.ngSelectComponent.isOpen = false;
+    }
   }
 
   // get work packages result list and append it to suggestions
@@ -153,8 +181,10 @@ export class GlobalSearchInputComponent implements OnInit {
   private autocompleteWorkPackages(query:string):Promise<(any)[]> {
     this.dynamicCssService.requireHighlighting();
 
-    // hide empty dropdown while spinner is shown
-    setTimeout( () => this.$element.find('.ng-dropdown-panel').hide());
+    // hide empty dropdown (only on desktop) while spinner is shown
+    if (!this.isMobile) {
+      setTimeout( () => this.$element.find('.ng-dropdown-panel').hide());
+    }
     this.$element.find('.ui-autocomplete--loading').show();
 
     let idOnly:boolean = false;
@@ -252,6 +282,10 @@ export class GlobalSearchInputComponent implements OnInit {
 
   private get searchValue() {
     return this.searchTerm ? this.searchTerm : '';
+  }
+
+  private get isMobile():boolean {
+    return (window.innerWidth < 680);
   }
 }
 
