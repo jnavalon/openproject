@@ -74,6 +74,7 @@ import {NoResultsComponent} from "core-app/modules/common/no-results/no-results.
 import {NgSelectModule} from "@ng-select/ng-select";
 import {UserAutocompleterComponent} from "app/modules/common/autocomplete/user-autocompleter.component";
 import {BrowserDetector} from "core-app/modules/common/browser/browser-detector.service";
+import {UserAvatarComponent} from "core-components/user/user-avatar/user-avatar.component";
 
 export function bootstrapModule(injector:Injector) {
   return () => {
@@ -149,6 +150,9 @@ export function bootstrapModule(injector:Injector) {
     // Autocompleter Component
     NgSelectModule,
     UserAutocompleterComponent,
+
+    // User Avatar
+    UserAvatarComponent,
   ],
   declarations: [
     OpDatePickerComponent,
@@ -195,6 +199,9 @@ export function bootstrapModule(injector:Injector) {
     NoResultsComponent,
 
     UserAutocompleterComponent,
+
+    // User Avatar
+    UserAvatarComponent,
   ],
   entryComponents: [
     OpDateTimeComponent,
